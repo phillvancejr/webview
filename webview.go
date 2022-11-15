@@ -398,6 +398,7 @@ type App struct {
 	Init func(WebView)
 	ServerInit func()
 	Topmost bool
+	server *http.ServeMux
 }
 
 func (app App) Run() {
@@ -428,8 +429,11 @@ func (app App) Run() {
 }
 
 func serve(app *App, portChannel chan<- string) {
+	if app.server == nil {
+		app.server = http.NewServeMux()
+	}
 	content, _ := fs.Sub(app.Content, app.ContentRoot)
-	http.Handle("/", http.FileServer(http.FS(content)))
+	app.server.Handle("/", http.FileServer(http.FS(content)))
 	if app.ServerInit != nil {
 		app.ServerInit()
 	}
@@ -441,5 +445,5 @@ func serve(app *App, portChannel chan<- string) {
 	port := strconv.Itoa(listener.Addr().(*net.TCPAddr).Port)
 	portChannel <- port
 	close(portChannel)
-	http.Serve(listener, nil)
+	http.Serve(listener, app.server)
 }
