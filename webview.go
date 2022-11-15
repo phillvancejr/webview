@@ -56,6 +56,7 @@ import (
 	"io/fs"
 	"strconv"
 	"embed"
+	"fmt"
 )
 
 func init() {
@@ -398,6 +399,7 @@ type App struct {
 	Init func(WebView)
 	ServerInit func()
 	Topmost bool
+	Debug bool
 	server *http.ServeMux
 }
 
@@ -406,8 +408,14 @@ func (app App) Run() {
 	go serve(&app, portChannel)
 
 	runtime.LockOSThread()
-	w := New(true)
+	w := New(app.Debug)
 	defer w.Destroy()
+	if app.Width == 0 {
+		app.Width = 500
+	}
+	if app.Height == 0 {
+		app.Height = 500
+	}
 	w.SetSize(app.Width, app.Height, HintFixed)
 	w.Center()
 	w.NoCtx()
@@ -420,11 +428,14 @@ func (app App) Run() {
 	}
 	port := <- portChannel
 	w.Navigate("http://localhost:"+port)
-	w.Init(`
+
+	webview_settings := fmt.Sprintf("const _webview_width=%d;const _webview_height=%d;const _webview_title=%s;const _webview={width:_webview_width,height:_webview_height,title:_webview_title};Object.freeze(_webview)", app.Width, app.Height, app.Title)
+	w.Init(fmt.Sprintf(`
+	%s
 	window.addEventListener("load", ()=>{
 		document.body.style.cssText += 'margin:0px;overflow:hidden;'
 	})
-	`)
+	`, webview_settings))
 	w.Run()
 }
 
