@@ -419,9 +419,11 @@ func (app App) Run() {
 	}
 	w.SetSize(app.Width, app.Height, HintFixed)
 	w.Center()
-	w.NoCtx()
+	if !app.Debug {
+		w.NoCtx()
+	}
 	w.SetTitle(app.Title)
-	if (app.Topmost) {
+	if app.Topmost {
 		w.Topmost(true)
 	}
 	if (app.Init != nil) {
