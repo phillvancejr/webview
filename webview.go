@@ -398,6 +398,7 @@ type App struct {
 	ContentRoot string
 	Init func(WebView)
 	ServerInit func()
+	Routes map[string] func(http.ResponseWriter, *http.Request)
 	Topmost bool
 	Debug bool
 	server *http.ServeMux
@@ -429,13 +430,17 @@ func (app App) Run() {
 	port := <- portChannel
 	w.Navigate("http://localhost:"+port)
 
-	webview_settings := fmt.Sprintf("const _webview_width=%d;const _webview_height=%d;const _webview_title=%s;const _webview={width:_webview_width,height:_webview_height,title:_webview_title};Object.freeze(_webview)", app.Width, app.Height, app.Title)
 	w.Init(fmt.Sprintf(`
-	%s
+	const _webview_width=%d;
+	const _webview_height=%d;
+	const _webview_title='%s';
+	const _webview_address='http://localhost:%s/';
+	const _webview={width:_webview_width,height:_webview_height,title:_webview_title,address:_webview_address};Object.freeze(_webview);
+
 	window.addEventListener("load", ()=>{
 		document.body.style.cssText += 'margin:0px;overflow:hidden;'
 	})
-	`, webview_settings))
+	`, app.Width, app.Height, app.Title, port))
 	w.Run()
 }
 
@@ -443,11 +448,21 @@ func serve(app *App, portChannel chan<- string) {
 	if app.server == nil {
 		app.server = http.NewServeMux()
 	}
+
 	content, _ := fs.Sub(app.Content, app.ContentRoot)
+
 	app.server.Handle("/", http.FileServer(http.FS(content)))
+
 	if app.ServerInit != nil {
 		app.ServerInit()
 	}
+	// handle routes
+	if app.Routes != nil {
+		for route, handler := range app.Routes {
+			app.server.Handle(route, handler)
+		}
+	}
+
 	listener, err := net.Listen("tcp", ":0")
 	if err != nil {
 		panic(err)
