@@ -390,6 +390,8 @@ func (w *webview) NoCtx() {
 	C.webview_no_ctx(w.w)
 }
 
+type RouteFunc = func(http.ResponseWriter, *http.Request)
+
 type App struct {
 	Width int
 	Height int
@@ -398,7 +400,7 @@ type App struct {
 	ContentRoot string
 	Init func(WebView)
 	ServerInit func()
-	Routes map[string] func(http.ResponseWriter, *http.Request)
+	Routes map[string] RouteFunc
 	Topmost bool
 	Debug bool
 	server *http.ServeMux
@@ -472,7 +474,15 @@ func serve(app *App, portChannel chan<- string) {
 	// handle routes
 	if app.Routes != nil {
 		for route, handler := range app.Routes {
-			app.server.HandleFunc(route, handler)
+			wrapper := func(w http.ResponseWriter, r *http.Request) {
+				// set headers to allow fetch locally
+				w.Header().Set("Access-Control-Allow-Origin", "*")
+				w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+				w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRFToken, Authorization")
+				// call the actual handler function
+				handler(w,r)
+			}
+			app.server.HandleFunc(route, wrapper)
 		}
 	}
 
