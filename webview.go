@@ -432,12 +432,23 @@ func (app App) Run() {
 	port := <- portChannel
 	w.Navigate("http://localhost:"+port)
 
+	w.Bind("_webview_log", func(args []string){
+		joined := strings.Join(args, " ")
+		println(joined)
+	})
+
 	w.Init(fmt.Sprintf(`
-	const _webview_width=%d;
-	const _webview_height=%d;
-	const _webview_title='%s';
-	const _webview_address='http://localhost:%s/';
-	const _webview={width:_webview_width,height:_webview_height,title:_webview_title,address:_webview_address};Object.freeze(_webview);
+	const _webview={
+		width:%d,
+		height:%d,
+		title:'%s',
+		address:'http://localhost:%s/',
+		log(){
+			const args = Array.from(arguments).map(a=>typeof a == 'object' ? JSON.stringify(a) : a.toString());
+			_webview_log(args);
+		}
+	};
+	Object.freeze(_webview);
 
 	window.addEventListener("load", ()=>{
 		document.body.style.cssText += 'margin:0px;overflow:hidden;'
