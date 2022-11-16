@@ -472,7 +472,7 @@ func serve(app *App, portChannel chan<- string) {
 	// handle routes
 	if app.Routes != nil {
 		for route, handler := range app.Routes {
-			app.server.Handle(route, handler)
+			app.server.HandleFunc(route, handler)
 		}
 	}
 
