@@ -440,9 +440,11 @@ func (app App) Run() {
 	})
 
 	w.Init(fmt.Sprintf(`
+	const _webview_width=%d;
+	const _webview_height=%d;
 	const _webview={
-		width:%d,
-		height:%d,
+		width:_webview_width,
+		height:_webview_height,
 		title:'%s',
 		address:'http://localhost:%s/',
 		log(){
