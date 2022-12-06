@@ -1,10 +1,12 @@
 # webview
 
-[![Join the chat at https://gitter.im/zserge/webview](https://badges.gitter.im/zserge/webview.svg)](https://gitter.im/zserge/webview?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+<!-- [![Join the chat at https://gitter.im/zserge/webview](https://badges.gitter.im/zserge/webview.svg)](https://gitter.im/zserge/webview?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://img.shields.io/github/workflow/status/zserge/webview/CI%20Pipeline)](https://github.com/zserge/webview)
 [![GoDoc](https://godoc.org/github.com/zserge/webview?status.svg)](https://godoc.org/github.com/zserge/webview)
-[![Go Report Card](https://goreportcard.com/badge/github.com/zserge/webview)](https://goreportcard.com/report/github.com/zserge/webview)
+[![Go Report Card](https://goreportcard.com/badge/github.com/zserge/webview)](https://goreportcard.com/report/github.com/zserge/webview) -->
 
+## 12/06/22 - No Longer Supported
+As of 12/06/22 I'm archiving this repo and moving to [Wails](https://github.com/wailsapp/wails). I use the Go api almost exclusively and wails is actively supported and already has a lot of great features, some of which I forked the original webview in order to add in this repo including: always on top/topmost, frontend embedding using Go's embed module, setting window size, position including centering. On top of that it has built in support for frameworks like Vue, React and Svelte. Finally, I primarily develop for Mac where webview is excellent, however I found it very frustrating to get it working on Windows, to the point I had settled on using electron, until I found Wails which produces <10mb fully bundled projects (with icon) in comparision to electrons 135mb+. If you're using webview with Go I strongly recommend switching to Wails, it is a great project and sees much more active support and development than the original webview/webview project.
 
 A tiny cross-platform webview library for C/C++/Golang to build modern cross-platform GUIs. Also, there are [Rust bindings](https://github.com/Boscop/webview-rs), [Python bindings](https://github.com/zserge/webview-python), [Nim bindings](https://github.com/oskca/webview), [Haskell](https://github.com/lettier/webviewhs), [C# bindings](https://github.com/webview/webview_csharp) and [Java bindings](https://github.com/shannah/webviewjar) available.
 
